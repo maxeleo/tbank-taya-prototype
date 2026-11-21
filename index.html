@@ -4,498 +4,430 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Тая · прототип</title>
-<meta name="description" content="Кликабельный прототип: ИИ-ассистент Тая замечает кассовый разрыв в конце месяца">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
+/* Источник всех размеров и цветов — макеты Figma (файл 1uIh433kyyqcUGAKbHYNck, секция «Макеты») */
 :root{
-  --page:#e9eaee; --ink:#1c1c1e; --ink2:#6b6d75; --ink3:#9a9ca3;
-  --surface:#ffffff; --bg:#f2f3f5; --chip:#eef0f3;
-  --blue:#336fee; --blue-soft:#e8effd; --yellow:#ffdd2d; --green:#00b92d; --red:#f52222;
-  --taya1:#2fc6ff; --taya2:#1fd6a0;
-  --font:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
-  --num:"Nunito","SF Pro Rounded",var(--font);
+  --text:#333; --text2:#9299a2; --blue:#0064fa; --blue-bg:rgba(47,172,254,.1); --grey-bg:rgba(0,16,36,.04);
+  --neutral:rgba(0,16,36,.03); --info:#428bf9; --green:#3aa981;
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",Inter,system-ui,sans-serif;
+  --sfr:ui-rounded,"SF Pro Rounded",-apple-system,"SF Pro Text",Inter,system-ui,sans-serif;
+  color-scheme:light;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--page);color:var(--ink);font:15px/1.4 var(--font);-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:#e9eaee;font-family:var(--sf);color:var(--text);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+p{margin:0}
 
-/* ---------- раскладка: телефон + панель пояснений ---------- */
-.stage{min-height:100%;display:flex;align-items:center;justify-content:center;gap:48px;padding:32px 16px}
-.phone{position:relative;width:375px;height:812px;border-radius:48px;background:#000;padding:10px;box-shadow:0 30px 80px rgba(20,24,40,.25);flex:none}
-.screen-host{position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;background:var(--bg)}
-.side{width:320px;max-width:100%}
-.side .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:600}
-.side h1{font-size:22px;line-height:1.25;margin:8px 0 12px;text-wrap:balance}
-.side p{color:#3b3d44;margin:0 0 16px}
-.steps{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0}
-.steps a{font-size:12px;padding:6px 10px;border-radius:99px;background:#fff;color:var(--ink2);text-decoration:none}
-.steps a.on{background:var(--ink);color:#fff}
-.hint{font-size:13px;color:var(--ink2)}
-@media (max-width:760px){
-  .stage{padding:0;gap:0;display:block}
-  .phone{width:100%;height:100vh;height:100dvh;border-radius:0;padding:0;box-shadow:none}
-  .screen-host{border-radius:0}
-  .side{display:none}
+/* телефон */
+.phone{position:relative;width:375px;height:852px;border-radius:44px;overflow:hidden;background:#fff;box-shadow:0 0 0 10px #111,0 30px 80px rgba(20,24,40,.3);flex:none}
+@media (max-width:500px),(max-height:880px) and (max-width:820px){
+  body{display:block;background:#fff}
+  .phone{width:100vw;height:100vh;height:100dvh;border-radius:0;box-shadow:none}
 }
-
-/* ---------- экраны ---------- */
-.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .32s}
+.scr{position:absolute;inset:0;overflow:hidden;background:#fff}
 .scr[hidden]{display:none!important}
-.scr.enter{transform:translateX(30px);opacity:0}
-.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.scroll::-webkit-scrollbar{display:none}
-.status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 28px 0 32px;font-weight:600;font-size:15px}
-.status i{display:inline-block;width:62px;height:12px;background:currentColor;-webkit-mask:linear-gradient(90deg,#000 0 26%,transparent 0 34%,#000 0 56%,transparent 0 64%,#000 0);mask:linear-gradient(90deg,#000 0 26%,transparent 0 34%,#000 0 56%,transparent 0 64%,#000 0)}
-.ic{display:inline-block;width:24px;height:24px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;flex:none}
-.toast{position:absolute;left:16px;right:16px;bottom:104px;background:rgba(28,28,30,.92);color:#fff;border-radius:14px;padding:12px 16px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:20}
-.toast.show{opacity:1;transform:none}
+.bg{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.hot{position:absolute;display:block}
+.fix{position:absolute;left:0;top:0;width:375px;height:852px;transform-origin:0 0;overflow:hidden}
 
-/* ---------- lockscreen ---------- */
-.lock{background:linear-gradient(160deg,#2b3a67,#6b4f8f 55%,#c27a8b);color:#fff}
-.lock .clock{text-align:center;margin-top:40px}
-.lock .clock b{display:block;font:600 84px/1 var(--font);letter-spacing:-2px}
-.lock .clock span{font-size:18px;opacity:.85}
-.push{margin:40px 10px 0;background:rgba(255,255,255,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--ink);border-radius:22px;padding:12px 14px;display:flex;gap:10px;text-align:left;width:calc(100% - 20px);animation:drop .5s .3s both}
-@keyframes drop{from{transform:translateY(-30px);opacity:0}}
-.push .app{width:38px;height:38px;border-radius:9px;background:var(--yellow);display:grid;place-items:center;flex:none}
-.push .t{display:flex;justify-content:space-between;font-weight:600;font-size:15px}
-.push .t small{font-weight:400;color:var(--ink2)}
-.lock .open{margin:auto auto 40px;color:#fff;opacity:.85;font-size:14px;padding:10px 18px;border-radius:99px;background:rgba(255,255,255,.18)}
+/* экран блокировки */
+#lock{background:#0b2a4a}
+#lock .lk{position:absolute;top:0;left:50%;height:100%;aspect-ratio:402/874;transform:translateX(-50%)}
+#lock .bg{width:100%;height:100%}
+#lock .push{position:absolute;left:4.98%;width:90.05%;top:76.43%;height:7.32%;border-radius:24px;animation:drop .6s .4s both}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}}
 
-/* ---------- главная ---------- */
-.home{background:var(--bg)}
-.island{background:#fff;border-radius:0 0 28px 28px;margin-top:-44px;padding:50px 0 14px;text-align:center;font-size:15px;display:flex;justify-content:center;gap:8px;align-items:center}
-.home-top{background:linear-gradient(180deg,#fff 0%,#fff 60%,var(--bg) 100%);border-radius:28px 28px 0 0;margin-top:8px;padding:12px 16px 0}
-.searchrow{display:flex;gap:8px;align-items:center}
-.ava{width:44px;height:44px;border-radius:50%;background:#e4e5e9;display:grid;place-items:center;color:var(--ink2);font-weight:500;flex:none}
-.search{flex:1;height:44px;border-radius:22px;background:var(--chip);display:flex;align-items:center;gap:6px;padding:0 12px;color:var(--ink3);font-size:17px}
-.gift{width:44px;height:44px;border-radius:50%;background:#ece5ff;color:#8a5cf6;display:grid;place-items:center;flex:none}
-.dots{display:flex;justify-content:center;gap:8px;margin:18px 0 28px}
-.dots i{width:7px;height:7px;border-radius:50%;background:#d3d5da}.dots i.on{background:#8e9099}
-.bal{text-align:center}
-.bal .crown{display:inline-flex;align-items:center;gap:4px;background:#2c2c2e;color:#fff;border-radius:8px;padding:1px 8px;font-size:12px}
-.bal b{display:block;font:800 48px/1.15 var(--num);letter-spacing:-.5px;margin-top:4px}
-.cardart{display:block;width:210px;height:84px;margin:28px auto 0;border-radius:18px 18px 0 0;object-fit:cover;object-position:top}
-.fasts{display:flex;gap:6px;overflow-x:auto;padding:16px 16px 4px;margin:0;background:var(--bg)}
-.fasts::-webkit-scrollbar{display:none}
-.fast{display:flex;flex-direction:column;align-items:center;gap:6px;width:82px;flex:none;font-size:13px}
-.fast .c{width:56px;height:56px;border-radius:50%;background:#fff;display:grid;place-items:center}
-.feed{padding:16px;display:flex;flex-direction:column;gap:12px}
-.card{background:#fff;border-radius:24px;padding:18px 20px}
-.taya-w{display:flex;align-items:center;gap:12px;text-align:left;width:100%;box-shadow:0 2px 14px rgba(47,198,255,.18);outline:1.5px solid #c9efff;animation:pulse 2.4s 1s ease-in-out 2}
-@keyframes pulse{50%{box-shadow:0 2px 24px rgba(47,198,255,.45)}}
-.taya-w .tx{flex:1}
-.taya-w b{display:block;font-size:17px;font-weight:600;line-height:1.25}
-.taya-w span{color:var(--ink2);font-size:13px}
-.orb{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--taya1),#1690ff 60%,var(--taya2));display:grid;place-items:center;flex:none;color:#fff}
-.orb.sm{width:28px;height:28px}
-.ops{display:flex;align-items:center;justify-content:space-between}
-.ops b{display:block;font-size:17px}
-.ops span{font-size:14px;color:var(--ink2)}
-.bars{display:flex;gap:4px;align-items:flex-end}
-.bars i{width:22px;border-radius:11px}
-.tabbar{flex:none;height:84px;background:rgba(255,255,255,.94);border-top:1px solid #e6e7ea;display:flex;justify-content:space-around;padding:8px 4px 0}
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--ink3);width:64px;position:relative}
-.tab.on{color:var(--blue)}
-.tab .badge{position:absolute;top:-4px;left:36px;background:var(--red);color:#fff;font-size:11px;border-radius:9px;padding:0 5px;font-weight:600}
+/* виджеты Таи поверх банковских экранов */
+.taya-ava{width:40px;height:40px;border-radius:100px;flex:none;display:block;object-fit:cover}
+.w-home{position:absolute;left:7px;top:593px;width:352px;height:80px;background:#fff;border-radius:20px;display:flex;gap:12px;align-items:center;padding:16px 16px 16px 20px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
+.w-home .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.w-home b{color:#333;font-weight:590;font-size:17px;letter-spacing:-.41px}
+.w-home span{font-size:14px;color:var(--text2)}
+.breathe{animation:breathe 2.8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08) rotate(-6deg)}}
+.w-card{position:absolute;left:16px;top:465px;width:343px;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
+.w-card .top{display:flex;gap:10px;align-items:center}
+.w-card .top img{width:32px;height:32px;border-radius:100px}
+.w-card .top b{font-weight:590;font-size:17px;letter-spacing:-.41px}
+.w-card p{font-size:16px;line-height:21px}
+.w-card .chips{display:flex;gap:8px;padding-top:8px}
+.tchip{height:30px;display:flex;align-items:center;padding:0 7px;border-radius:30px;background:var(--blue-bg)}
+.tchip span{display:block;padding:7px;width:84px;font-weight:590;font-size:13px;color:var(--blue);white-space:nowrap}
 
-/* ---------- чек P2P (шторка) ---------- */
-.sheetbg{background:#5f6065}
-.sheet{flex:1;background:var(--bg);border-radius:14px 14px 0 0;margin-top:16px;display:flex;flex-direction:column;overflow:hidden}
-.sheet .bar{display:flex;align-items:center;justify-content:center;position:relative;height:52px;flex:none;font-size:17px;font-weight:500}
-.sheet .bar button{position:absolute;left:16px;color:var(--blue);font-size:17px}
-.receipt{text-align:center;padding:12px 16px 0}
-.logo-t{width:80px;height:80px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;margin:0 auto 14px}
-.tagcat{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:8px;padding:2px 8px;font-size:14px;color:var(--ink2);margin-top:6px}
-.amount{font:800 36px/1.2 var(--num);color:var(--green);margin:16px 0}
-.acts{display:flex;justify-content:center;gap:12px}
-.acts div{width:92px;height:70px;background:#e8effd;border-radius:16px;color:var(--blue);font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.chip-taya{text-align:left;margin:20px 16px 0;box-shadow:0 2px 14px rgba(47,198,255,.18);outline:1.5px solid #c9efff}
-.chip-taya .h{display:flex;gap:10px;align-items:center;font-weight:600;font-size:16px}
-.chip-taya p{margin:10px 0 14px;font-size:16px}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-.pill{background:var(--blue-soft);color:var(--blue);font-weight:600;font-size:14px;border-radius:99px;padding:8px 14px}
-.pill.ghost{background:var(--chip);color:var(--ink)}
-.row{display:flex;align-items:center;gap:12px}
-.mini{font-size:13px;color:var(--ink2)}
+/* чат */
+#chat{display:flex;flex-direction:column}
+.sb{height:44px;position:relative;flex:none}
+.sb img{position:absolute;top:50%;display:block}
+.topnav{flex:none;background:#fff;position:relative;z-index:3}
+.navrow{height:44px;margin:0 16px 10px;display:flex;justify-content:space-between;align-items:center}
+.lead{display:flex;gap:16px;align-items:center;height:44px}
+.glass{height:44px;min-width:44px;border-radius:296px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.72);box-shadow:0 2px 14px rgba(0,0,0,.08),inset 0 0 0 .5px rgba(0,0,0,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.glass.back{padding:0 7px}
+.glass.right{padding:0 10px;gap:24px}
+.flat{display:flex;gap:8px;align-items:center}
+.flat img{width:36px;height:36px;border-radius:100px}
+.flat b{font-weight:590;font-size:17px;letter-spacing:-.41px}
+.mask{display:block;width:24px;height:24px;background:var(--c,#333);-webkit-mask:var(--m) 0 0/var(--s,24px 24px) no-repeat;mask:var(--m) 0 0/var(--s,24px 24px) no-repeat}
+#feedwrap{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#feedwrap::-webkit-scrollbar{display:none}
+#feed{display:flex;flex-direction:column;gap:20px;padding:12px 16px 140px}
 
-/* ---------- чат Таи ---------- */
-.chat{background:linear-gradient(180deg,#eaf6ff 0,#f6f7f9 220px)}
-.topnav{height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
-.back{display:flex;align-items:center;gap:4px;color:var(--blue);font-size:17px}
-.back::before{content:"";width:10px;height:10px;border-left:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);margin-right:4px}
-.ttl{display:flex;gap:8px;align-items:center;font-weight:600;font-size:17px}
-.ttl em{font-style:normal;background:linear-gradient(90deg,var(--taya1),#1690ff);color:#fff;font-size:11px;padding:1px 6px;border-radius:6px}
-.nav-r{display:flex;gap:14px;color:var(--ink2)}
-.msgs{padding:12px 16px 24px;display:flex;flex-direction:column;gap:16px}
-.me{align-self:flex-end;background:#fff;border-radius:18px 18px 4px 18px;padding:9px 14px;font-size:16px;max-width:85%;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.ans h2{font-size:28px;line-height:1.15;margin:4px 0 12px;font-weight:700;text-wrap:balance;letter-spacing:-.3px}
-.ans h3{font-size:20px;margin:22px 0 10px}
-.ans p{margin:0 0 12px;font-size:16px}
-.ans ol{margin:0;padding:0;list-style:none;counter-reset:n}
-.ans ol li{counter-increment:n;display:flex;gap:8px;margin-bottom:10px;font-size:16px}
-.ans ol li::before{content:counter(n)".";color:var(--ink2);min-width:16px}
-.bubble{background:#fff;border-radius:20px;padding:14px 16px;font-size:17px;line-height:1.35}
-.sugg{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.sugg button{background:#fff;border-radius:99px;padding:8px 14px;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.sugg button.main{background:var(--blue);color:#fff}
-.info{background:#e8effd;border-radius:16px;padding:12px 14px;display:flex;gap:10px;font-size:15px;margin-top:8px}
-.info::before{content:"i";flex:none;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center}
-.disc{font-size:13px;color:var(--ink3);margin-top:14px}
-.disc a{color:var(--ink2)}
-.react{display:flex;gap:18px;color:var(--ink3);margin-top:14px;font-size:18px}
-.chips2{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.chips2 button{background:#fff;border-radius:99px;padding:8px 14px;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.chips2 button.main{background:var(--blue);color:#fff}
-.composer{flex:none;margin:8px 12px 24px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:26px;padding:12px 16px;color:var(--ink3);font-size:16px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
-.chartcard{background:#fff;border-radius:20px;padding:16px;margin:6px 0 4px}
-.chartcard .cap{font-size:13px;color:var(--ink2)}
-.chartcard .big{font:700 28px/1.2 var(--font);margin:4px 0 10px}
-.chartcard svg{display:block;width:100%;height:auto}
-.legend{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-top:8px}
-.legend span{display:flex;align-items:center;gap:6px}
-.grp{margin-top:18px}
-.grp .gh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-.grp .gh b{font-size:20px}
-.grp .gh small{color:var(--ink2);font-size:13px}
-.op{display:flex;align-items:center;gap:12px;background:#fff;padding:10px 14px;width:100%;text-align:left}
-.op:first-of-type{border-radius:18px 18px 0 0}.op:last-of-type{border-radius:0 0 18px 18px}.op:only-of-type{border-radius:18px}
-.op .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:15px;flex:none}
-.op .tx{flex:1}.op .tx b{display:block;font-weight:500}.op .tx span{font-size:13px;color:var(--ink2)}
-.op .sum{color:var(--green);font-weight:500}
-.opts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-.opt{display:flex;gap:14px;background:#fff;border-radius:20px;padding:14px 16px;text-align:left;width:100%;align-items:flex-start}
-.opt .oi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:20px}
-.opt b{display:block;font-size:17px;font-weight:600}
-.opt span{font-size:14px;color:var(--ink2)}
-.opt .prod{display:inline-block;font-size:11px;color:var(--ink2);background:var(--chip);border-radius:6px;padding:1px 6px;margin-bottom:4px}
-.opt::after{content:"";width:8px;height:8px;border-right:2px solid var(--ink3);border-top:2px solid var(--ink3);transform:rotate(45deg);align-self:center;flex:none}
-.opt.dim{opacity:.92}
-ul.done{padding:0;margin:8px 0 0;list-style:none}
-ul.done li{display:flex;gap:10px;margin-bottom:12px;font-size:16px}
-ul.done li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink);margin-top:9px;flex:none}
+/* стартовое состояние (экран 3) */
+#intro{position:absolute;inset:0;z-index:1}
+#intro .status-block{position:absolute;left:0;width:100%;top:calc(50% - 46px);transform:translateY(-50%);padding:32px 16px}
+#intro .status-block p{font-weight:700;font-size:20px;letter-spacing:.38px}
+#intro .btns{position:absolute;left:0;top:428px;width:298px;padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.tbtn{display:flex;align-items:center;padding:10px;border-radius:999px;background:var(--blue-bg)}
+.tbtn.grey{background:var(--grey-bg)}
+.tbtn span{display:block;padding:3px 8px;font-size:15px;letter-spacing:-.24px;color:var(--blue);white-space:nowrap}
+.tbtn.grey span{color:#333}
+.tbtn img,.tbtn .mask{width:24px;height:24px;flex:none}
 
-/* ---------- кубышка ---------- */
-.kub .hero{text-align:center;padding:12px 16px 0}
-.kub .wallet{width:80px;height:80px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;margin:0 auto 14px}
-.kub .lim{font:800 30px/1.2 var(--num);margin:28px 0}
-.kub .how{background:#fff;border-radius:24px;padding:20px;margin:0 16px;text-align:left}
-.kub .how h3{margin:0 0 14px;font-size:20px}
-.kub .how dl{margin:0}.kub .how dt{font-size:13px;color:var(--ink2)}.kub .how dd{margin:2px 0 14px;font-size:16px}
-.kub .foot{margin-top:auto;padding:16px;text-align:center}
-.kub .foot p{font-size:13px;color:var(--ink3);margin:0 0 12px}
-.cta{display:block;width:100%;background:var(--yellow);border-radius:16px;padding:17px;font-size:17px;font-weight:500}
-.cta:active{filter:brightness(.95)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* сообщения */
+.um{display:flex;justify-content:flex-end;padding-left:32px}
+.um div{flex:1;background:var(--blue-bg);border-radius:14px;padding:8px 10px;font-size:17px;letter-spacing:-.41px}
+.ans{display:flex;flex-direction:column}
+.ans > *{animation:rise .35s both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+.h1{font-weight:700;font-size:30px;letter-spacing:.36px}
+.h2{font-weight:700;font-size:20px;letter-spacing:.38px;padding-top:20px}
+.para{padding-top:12px;font-size:17px;letter-spacing:-.41px}
+.li{display:flex;gap:8px;font-size:17px;letter-spacing:-.41px;padding-top:8px}
+.li.first{padding-top:12px}
+.bli{display:flex;gap:12px;padding:8px 0 0 6px;font-size:17px;letter-spacing:-.41px}
+.bli.first{padding-top:12px}
+.bli img{width:6px;height:6px;margin-top:7px;flex:none}
+.quote{margin-top:16px;background:var(--neutral);border-left:3px solid var(--info);padding:12px 16px;font-size:17px;letter-spacing:-.41px}
+.hr{display:block;width:100%;height:20px}
+.actions{display:flex;justify-content:space-between;align-items:center;padding-top:12px}
+.actions .l{display:flex;gap:2px}
+.act{min-height:30px;padding:3px 7px;display:flex;align-items:center;justify-content:center}
+.act .mask{width:16px;height:16px;--s:16px 16px;--c:rgba(0,0,0,.48)}
+.act.on .mask{--c:var(--blue)}
+.foot{padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:13px;letter-spacing:-.08px;color:var(--text2)}
+.sugg{padding-top:20px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;padding:0 7px;border-radius:30px;background:var(--blue-bg)}
+.chip span{display:block;padding:7px 4px;font-weight:590;font-size:13px;letter-spacing:-.08px;color:var(--blue);white-space:nowrap}
+.chip.grey{background:var(--grey-bg)}
+.chip.grey span{color:#333}
+.sugg.used{display:none}
+
+/* график */
+.chart{margin-top:16px;background:var(--neutral);border-radius:24px;padding:16px 16px 14px;overflow:hidden}
+.chart .big{font-family:var(--sfr);font-weight:700;font-size:30px;letter-spacing:-.5px}
+.chart .cap{font-size:13px;color:var(--text2)}
+.plot{position:relative;height:136px;margin-top:10px;overflow:hidden}
+.plot > div{position:absolute}
+.plot img{position:absolute;display:block;max-width:none}
+.xaxis{display:flex;justify-content:space-between;font-size:12px;color:var(--text2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 8px;padding-top:16px}
+.legend div{height:30px;background:#fff;border-radius:99px;padding:0 8px;display:flex;gap:4px;align-items:center;font-size:12px;color:var(--text2)}
+.legend img{width:12px;height:12px}
+
+/* операции */
+.grp{padding-top:20px;display:flex;flex-direction:column;gap:4px}
+.gh{display:flex;justify-content:space-between;align-items:baseline;white-space:nowrap}
+.gh b{font-weight:700;font-size:20px}
+.gh span{font-size:13px;color:var(--text2)}
+.op{display:flex;gap:12px;align-items:center;padding:10px 0;width:100%}
+.op .av{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:590;font-size:15px;flex:none}
+.op .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;white-space:nowrap}
+.op .tx b{font-weight:400;font-size:17px;letter-spacing:-.41px}
+.op .tx span{font-size:13px;color:var(--text2)}
+.op .sum{font-size:17px;letter-spacing:-.41px;color:var(--green);white-space:nowrap}
+
+/* варианты */
+.opts{padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:center;padding:16px 12px 16px 16px;border-radius:16px;background:var(--neutral);width:100%}
+.opt:active{background:rgba(0,16,36,.07)}
+.opt .ib{width:44px;height:44px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.opt .ib img{width:24px;height:24px}
+.opt .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.opt .tx b{font-weight:590;font-size:17px;letter-spacing:-.41px}
+.opt .tx span{font-size:15px;letter-spacing:-.24px;color:var(--text2)}
+.opt .tx i{font-style:normal;background:rgba(0,16,36,.06);border-radius:6px;padding:2px 6px;font-weight:590;font-size:11px;color:var(--text2)}
+.opt .chev{width:16px;height:16px;flex:none}
+
+/* скелетон генерации */
+.skel{display:flex;flex-direction:column;gap:12px}
+.skel .row{display:flex;gap:10px;align-items:center;font-size:15px;color:var(--text2)}
+.skel .row img{width:24px;height:24px;border-radius:100px;animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skel i{display:block;height:14px;border-radius:7px;background:linear-gradient(90deg,#f1f2f4 0%,#e3e5e9 40%,#f1f2f4 80%);background-size:300% 100%;animation:shim 1.2s linear infinite}
+.skel i.h{height:26px;width:78%;border-radius:10px}
+@keyframes shim{from{background-position:100% 0}to{background-position:-200% 0}}
+
+/* поле ввода */
+.panel{position:absolute;left:16px;right:16px;bottom:30px;height:80px;border-radius:24px;padding:8px;z-index:4;background:rgba(255,255,255,.82);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);filter:drop-shadow(0 6px 17px rgba(0,0,0,.12));display:flex;flex-direction:column;gap:4px}
+.panel .in{height:30px;display:flex;align-items:center;padding-left:8px;font-size:17px;letter-spacing:-.41px;color:var(--text2)}
+.panel .bot{display:flex;gap:4px;align-items:center}
+.panel .pl{min-height:30px;padding:3px 7px;display:flex;align-items:center}
+.panel .pl .mask{width:16px;height:16px;--s:16px 16px;--c:var(--text2)}
+.panel .sk{background:var(--neutral);border-radius:30px;padding:0 7px}
+.panel .sk span{display:block;padding:7px 4px;font-weight:590;font-size:13px;letter-spacing:-.08px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
-<div class="stage">
-  <div class="phone"><div class="screen-host" id="host">
+<div class="phone" id="phone">
 
-  <!-- 1 · пуш на экране блокировки -->
-  <section class="scr lock" data-s="push" data-step="1 · Триггер" data-note="Существующий пуш Т-Банка «Перевод получен» — свой пуш не добавляем, стек уведомлений и так забит. Тап по пушу открывает чек перевода.">
-    <div class="status" style="color:#fff"><span>9:41</span><i></i></div>
-    <div class="clock"><b>9:41</b><span>пятница, 28 ноября</span></div>
-    <button class="push" data-go="receipt">
-      <div class="app"><span class="ic" style="--m:url(assets/tab-main.svg);width:26px;height:26px"></span></div>
-      <div style="flex:1"><div class="t">Т-Банк <small>сейчас</small></div><div>Перевод получен: 1 500 ₽ от Алексея К.</div></div>
+  <!-- экран блокировки (Figma: Notifications 19:8175) -->
+  <section class="scr" id="lock">
+   <div class="fix">
+    <div class="lk">
+      <img class="bg" src="fig/bg-lock.jpg" alt="Экран блокировки: пуш Т-Банка «Алексей К. Перевод 1 500 ₽»">
+      <button class="hot push" data-go="receipt" aria-label="Открыть пуш Т-Банка"></button>
+    </div>
+   </div>
+  </section>
+
+  <!-- чек перевода (Figma: 2a 20:421) -->
+  <section class="scr" id="receipt" hidden>
+   <div class="fix">
+    <img class="bg" src="fig/bg-receipt.jpg" alt="">
+    <button class="hot" style="left:0;top:56px;width:110px;height:56px" data-go="home" aria-label="Закрыть"></button>
+    <div class="w-card" id="receiptCard">
+      <div class="top"><img src="fig/taya-avatar.png" alt="" class="breathe"><b>Тая заметила</b></div>
+      <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
+      <div class="chips">
+        <button class="tchip" data-chat="receipt"><span>Разобрать</span></button>
+        <button class="tchip" data-dismiss="receiptCard"><span>Не сейчас</span></button>
+      </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- главная (Figma: 2b 20:625) -->
+  <section class="scr" id="home" hidden>
+   <div class="fix">
+    <img class="bg" src="fig/bg-home.jpg" alt="">
+    <button class="w-home" data-chat="home">
+      <span class="t"><b>Тая заметила</b><span>Конец месяца бывает напряжённым</span></span>
+      <img class="taya-ava breathe" src="fig/taya-avatar.png" alt="Тая">
     </button>
-    <button class="open" data-go="home">Или открыть приложение →</button>
+   </div>
   </section>
 
-  <!-- 2a · чек входящего перевода -->
-  <section class="scr sheetbg" data-s="receipt" hidden data-step="2a · Чек перевода" data-note="Единственное новое на экране — карточка Таи внизу чека. Без картинок и без оффера. «Разберём?» — сначала спрашиваем согласие.">
-    <div class="status" style="color:#fff"><span>9:41</span><i></i></div>
-    <div class="sheet">
-      <div class="bar"><button data-go="home">Закрыть</button>28 ноября · 09:38</div>
-      <div class="scroll">
-        <div class="receipt">
-          <div class="logo-t"><span class="ic" style="--m:url(assets/tab-main.svg);width:40px;height:40px"></span></div>
-          <div style="font-size:17px">Алексей К.</div>
-          <div class="tagcat"><span style="width:14px;height:14px;background:#7fd4e8;border-radius:3px"></span>Переводы</div>
-          <div class="amount">+1 500 ₽</div>
-          <div class="acts"><div><span class="ic" style="--m:url(assets/eye-off.svg)"></span>Не учитывать</div><div><span class="ic" style="--m:url(assets/transfer.svg)"></span>Вернуть</div></div>
+  <!-- чат Таи (Figma: 3–8) -->
+  <section class="scr" id="chat" hidden>
+    <div class="topnav">
+      <div class="sb">
+        <img src="fig/sb-time.svg" alt="" style="left:34px;width:28.426px;height:11.089px;transform:translateY(calc(-50% + .54px))">
+        <img src="fig/sb-signal.svg" alt="" style="right:18px;width:63px;height:10px;transform:translateY(calc(-50% + 1px))">
+        <img src="fig/sb-battery.svg" alt="" style="right:14px;width:25px;height:12px;transform:translateY(calc(-50% + 1px))">
+      </div>
+      <div class="navrow">
+        <div class="lead">
+          <button class="glass back" id="chatBack" aria-label="Назад"><img src="fig/ic-back.svg" width="24" height="24" alt=""></button>
+          <div class="flat"><img src="fig/taya-avatar.png" alt="" id="hdrAva"><b>Тая ИИ</b></div>
         </div>
-        <div class="card chip-taya">
-          <div class="h"><span class="orb sm">✦</span>Тая заметила закономерность</div>
-          <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
-          <div class="btns"><button class="pill" data-go="consent">Разобрать</button><button class="pill ghost" data-toast="Хорошо, не буду напоминать об этом до следующего месяца" data-go="home">Не сейчас</button></div>
+        <div class="glass right">
+          <span class="mask" style="--m:url(fig/ic-chat-plus.svg)"></span>
+          <span class="mask" style="--m:url(fig/ic-list.svg)"></span>
         </div>
-        <div class="card" style="margin:12px 16px">
-          <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:20px">Пополнение</b><span style="color:var(--blue)">Справка</span></div>
-          <div class="row" style="margin-top:12px"><div class="ava" style="background:var(--blue);color:#fff;width:40px;height:40px">₽</div><div><div>Black</div><div class="mini">1 649,60 ₽</div></div></div>
-        </div>
-        <div class="card" style="margin:0 16px 24px"><b style="font-size:20px">Реквизиты</b><div class="mini" style="margin-top:10px">Отправитель</div><div>Алексей К.</div></div>
       </div>
     </div>
-  </section>
-
-  <!-- 2b · главная -->
-  <section class="scr home" data-s="home" hidden data-step="2b · Главная" data-note="Если пользователь зашёл без пуша, его встречает карточка Таи в ленте, в стиле существующих карточек. Та же формулировка-вопрос и одно действие.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="scroll">
-      <div class="island"><span class="ic" style="--m:url(assets/bell.svg);width:18px;height:18px"></span>Все уведомления</div>
-      <div class="home-top">
-        <div class="searchrow">
-          <div class="ava">М</div>
-          <div class="search"><span class="ic" style="--m:url(assets/search.svg);width:20px;height:20px"></span>Поиск</div>
-          <div class="gift"><span class="ic" style="--m:url(assets/gift.svg)"></span></div>
+    <div id="feedwrap">
+      <div id="intro">
+        <div class="status-block"><p>Заметила кое‑что переводах за последние 3 месяца. Разберём вместе?</p></div>
+        <div class="btns">
+          <button class="tbtn" data-ask="diag"><span class="mask" style="--c:#0064fa;--m:url(fig/ic-compare.svg);-webkit-mask-position:1.126px 3px;mask-position:1.126px 3px;--s:21.749px 18px"></span><span>Да, покажи разбор</span></button>
+          <button class="tbtn" data-ask="why"><img src="fig/ic-note-check.svg" alt=""><span>Почему ты мне пишешь?</span></button>
+          <button class="tbtn grey" data-ask="later"><span>Не сейчас</span></button>
         </div>
-        <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
-        <div class="bal"><span class="crown">♛ 0 ₽</span><b>149 ₽</b></div>
-        <img class="cardart" src="assets/card-mir.png" alt="Карта Black">
       </div>
-      <div class="fasts">
-        <div class="fast"><div class="c"><span class="ic" style="--m:url(assets/plus.svg)"></span></div>Пополнить</div>
-        <div class="fast"><div class="c"><span class="ic" style="--m:url(assets/qr.svg)"></span></div>Сканировать</div>
-        <div class="fast"><div class="c"><span class="ic" style="--m:url(assets/arrow.svg)"></span></div>Перевести</div>
-        <div class="fast"><div class="c"><img src="assets/gas.svg" width="26" height="26" alt=""></div>Топливо</div>
-        <div class="fast"><div class="c"><span class="ic" style="--m:url(assets/card.svg)"></span></div>Ежемесячные</div>
-      </div>
-      <div class="feed">
-        <button class="card taya-w" data-go="consent">
-          <div class="tx"><b>Тая заметила закономерность</b><span>Под конец месяца бывает тесно</span></div>
-          <span class="orb">✦</span>
-        </button>
-        <div class="card ops">
-          <div><b>Операции</b><span>Траты в ноябре 48 730 ₽</span></div>
-          <div class="bars"><i style="height:22px;background:#ff9a9e"></i><i style="height:34px;background:#4fc9e8"></i><i style="height:44px;background:#3aa9a0"></i></div>
-        </div>
-        <div class="card"><b style="font-size:17px">Кэшбэк и бонусы</b><div class="mini">4 категории на ноябрь</div></div>
-      </div>
+      <div id="feed"></div>
     </div>
-    <nav class="tabbar">
-      <div class="tab on"><span class="ic" style="--m:url(assets/tab-main.svg)"></span>Главная<span class="badge">1</span></div>
-      <div class="tab"><span class="ic" style="--m:url(assets/tab-pay.svg)"></span>Платежи</div>
-      <div class="tab"><span class="ic" style="--m:url(assets/tab-city.svg)"></span>Город</div>
-      <div class="tab"><span class="ic" style="--m:url(assets/tab-chat.svg)"></span>Чат</div>
-      <div class="tab"><span class="ic" style="--m:url(assets/tab-shop.svg)"></span>Витрина</div>
-    </nav>
-  </section>
-
-  <!-- 3 · вход в чат, согласие -->
-  <section class="scr chat" data-s="consent" hidden data-step="3 · Согласие" data-note="Никакого оффера до согласия. Диагноз появляется только после «Да, покажи разбор». На этом держится вся подача без давления.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-back>Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs" style="padding-top:120px">
-      <div class="bubble">Заметила кое‑что в переводах за последние 3 месяца. Разберём вместе?</div>
-      <div class="sugg">
-        <button class="main" data-go="diag">Да, покажи разбор</button>
-        <button data-toast="Я замечаю закономерности в ваших операциях, чтобы вовремя подсказать. Это не реклама — отключить можно в настройках">Почему ты мне пишешь?</button>
-        <button data-toast="Хорошо. Вернёмся к этому, когда будет удобно" data-go="home">Не сейчас</button>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <!-- 4 · диагноз -->
-  <section class="scr chat" data-s="diag" hidden data-step="4 · Диагноз" data-note="Ответ построен по шаблону Таи: заголовок, абзац, график, пункты «на чём основан вывод», подсказки и пометка «ответ сгенерирован ИИ».">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-back>Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs">
-      <div class="me">Да, покажи разбор</div>
-      <div class="ans">
-        <h2>Под конец месяца бывает тяжело</h2>
-        <p>Последние 3 месяца с 25 по 30 число остаток на карте опускается ниже того, что вы обычно тратите за 3 дня. В эти же дни вам переводят деньги знакомые.</p>
-        <div class="chartcard">
-          <div class="cap">Остаток по карте в последние дни месяца</div>
-          <div class="big">около 300 ₽</div>
-          <svg viewBox="0 0 311 150" role="img" aria-label="Остаток падает ниже обычного расхода в конце каждого месяца">
-            <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#336fee" stop-opacity=".22"/><stop offset="1" stop-color="#336fee" stop-opacity="0"/></linearGradient></defs>
-            <line x1="0" y1="96" x2="311" y2="96" stroke="#9a9ca3" stroke-dasharray="4 4"/>
-            <text x="4" y="110" font-size="10" fill="#6b6d75">обычно за 3 дня — 4 200 ₽</text>
-            <path id="curve" d="M0 30 C20 28 40 40 60 60 S85 118 92 124 L96 36 C120 34 140 46 160 64 S186 122 194 128 L198 32 C222 30 242 44 262 62 S288 120 300 126 L311 118" fill="none" stroke="#336fee" stroke-width="2.5" stroke-linejoin="round"/>
-            <path d="M0 30 C20 28 40 40 60 60 S85 118 92 124 L96 36 C120 34 140 46 160 64 S186 122 194 128 L198 32 C222 30 242 44 262 62 S288 120 300 126 L311 118 L311 140 L0 140Z" fill="url(#ar)"/>
-            <g fill="#f52222" stroke="#fff" stroke-width="2"><circle cx="88" cy="121" r="5"/><circle cx="190" cy="125" r="5"/><circle cx="296" cy="124" r="5"/></g>
-            <g font-size="11" fill="#6b6d75"><text x="30" y="148">сентябрь</text><text x="128" y="148">октябрь</text><text x="232" y="148">ноябрь</text></g>
-          </svg>
-          <div class="legend"><span><i style="width:14px;height:3px;background:#336fee;border-radius:2px"></i>остаток на карте</span><span><i style="width:9px;height:9px;background:#f52222;border-radius:50%"></i>дни, когда занимали</span></div>
-        </div>
-        <h3>На чём основан вывод</h3>
-        <ol>
-          <li>Остаток ниже трёхдневного расхода — 3 месяца подряд</li>
-          <li>В эти дни — 7 входящих переводов от 3 человек</li>
-          <li>После зарплаты вы возвращали те же суммы тем же людям — похоже на займы до зарплаты</li>
-        </ol>
-        <div class="react">👍 👎 ⧉</div>
-        <div class="disc">Ответ сгенерирован ИИ и может содержать неточности. Проверяйте важную информацию. <a>Подробнее — в правилах сервиса</a></div>
-        <div class="chips2">
-          <button data-go="ops">Покажи эти операции</button>
-          <button class="main" data-go="options">Что можно сделать?</button>
-          <button data-go="notme">Это не про меня</button>
-        </div>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <!-- 5 · операции -->
-  <section class="scr chat" data-s="ops" hidden data-step="5 · Доказательства" data-note="Вывод проверяется на уровне конкретных операций, а не абстрактного скора. Любая операция открывается в истории.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-back>Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs">
-      <div class="me">Покажи эти операции</div>
-      <div class="ans">
-        <h2>Переводы с 25 по 30 число</h2>
-        <p>Вот на каких операциях основан вывод. Нажмите на любую — она откроется в истории.</p>
-        <div class="grp"><div class="gh"><b>Ноябрь</b><small>остаток 27-го — 340 ₽</small></div>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#ffe9d6;color:#c46a1b">АК</span><span class="tx"><b>Алексей К.</b><span>СБП · 26 ноября</span></span><span class="sum">+1 500 ₽</span></button>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#ffe1ea;color:#c23a63">МП</span><span class="tx"><b>Мария П.</b><span>СБП · 28 ноября</span></span><span class="sum">+2 000 ₽</span></button>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#dff3e6;color:#24874a">АС</span><span class="tx"><b>Антон С.</b><span>СБП · 29 ноября</span></span><span class="sum">+1 000 ₽</span></button>
-        </div>
-        <div class="grp"><div class="gh"><b>Октябрь</b><small>остаток 28-го — 210 ₽</small></div>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#ffe9d6;color:#c46a1b">АК</span><span class="tx"><b>Алексей К.</b><span>27 октября · вернули 6 ноября</span></span><span class="sum">+2 000 ₽</span></button>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#ffe1ea;color:#c23a63">МП</span><span class="tx"><b>Мария П.</b><span>29 октября · вернули 6 ноября</span></span><span class="sum">+1 500 ₽</span></button>
-        </div>
-        <div class="grp"><div class="gh"><b>Сентябрь</b><small>остаток 27-го — 480 ₽</small></div>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#ffe9d6;color:#c46a1b">АК</span><span class="tx"><b>Алексей К.</b><span>26 сентября · вернули 5 октября</span></span><span class="sum">+1 000 ₽</span></button>
-          <button class="op" data-toast="Открою операцию в истории"><span class="av" style="background:#dff3e6;color:#24874a">АС</span><span class="tx"><b>Антон С.</b><span>28 сентября · вернули 5 октября</span></span><span class="sum">+3 000 ₽</span></button>
-        </div>
-        <div class="info">Всего 12 000 ₽ за 3 месяца. Сентябрь и октябрь вы вернули сразу после зарплаты</div>
-        <div class="disc">Ответ сгенерирован ИИ и может содержать неточности. Проверяйте важную информацию. <a>Подробнее — в правилах сервиса</a></div>
-        <div class="chips2"><button class="main" data-go="options">Что можно сделать?</button><button data-go="notme">Это не про меня</button></div>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <!-- 6 · варианты -->
-  <section class="scr chat" data-s="options" hidden data-step="6 · Варианты" data-note="Сначала варианты без кредита. Кубышка — последней, как страховка. Четыре варианта на выбор вместо одной кнопки — это не прямая реклама.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-back>Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs">
-      <div class="me">Что можно сделать?</div>
-      <div class="ans">
-        <h2>Что можно сделать</h2>
-        <p>Несколько вариантов — выберите, что ближе. Я предупрежу заранее, если конец месяца снова будет напряжённым</p>
-        <div class="opts">
-          <button class="opt" data-toast="Открою настройку автоперевода в копилку"><span class="oi" style="background:#e5f7ea">🐷</span><span><b>Откладывать с зарплаты</b><span>Автоматически 2 000 ₽ в день зарплаты</span></span></button>
-          <button class="opt" data-toast="Покажу 4 подписки и новые даты списаний"><span class="oi" style="background:#fff4d6">📅</span><span><b>Перенести списания</b><span>4 подписки на 1 640 ₽ списываются 25–28 числа. Можно сдвинуть</span></span></button>
-          <button class="opt" data-toast="Открою аналитику трат за вторую половину месяца"><span class="oi" style="background:#e8effd">📊</span><span><b>Разобрать траты месяца</b><span>Покажу, что съедает бюджет во второй половине месяца</span></span></button>
-          <button class="opt" data-go="kub"><span class="oi" style="background:#fff8cc">👛</span><span><i class="prod">Продукт Т-Банка</i><b>Кубышка на всякий случай</b><span>Запас денег от банка — неделя без комиссий</span></span></button>
-        </div>
-        <div class="react">👍 👎 ⧉</div>
-        <div class="disc">Ответ сгенерирован ИИ и может содержать неточности. Проверяйте важную информацию. <a>Подробнее — в правилах сервиса</a></div>
-        <div class="chips2"><button data-toast="Напишу за 3 дня до 25-го, если остаток будет ниже обычного">Предупреди заранее</button><button data-go="notme">Это не про меня</button></div>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <!-- 7 · кубышка -->
-  <section class="scr sheetbg kub" data-s="kub" hidden data-step="7 · Кубышка" data-note="Подключение существующего продукта. Без заявки и без проверки кредитной истории — условия видны до подключения.">
-    <div class="status" style="color:#fff"><span>9:41</span><i></i></div>
-    <div class="sheet">
-      <div class="bar"><button data-back>Закрыть</button>Кубышка</div>
-      <div class="scroll" style="display:flex;flex-direction:column">
-        <div class="hero">
-          <div class="wallet"><span class="ic" style="--m:url(assets/card.svg);width:36px;height:36px"></span></div>
-          <div style="font-size:17px">Запас денег от банка</div>
-          <div class="lim">до 15 000 ₽</div>
-        </div>
-        <div class="how"><h3>Как это работает</h3><dl>
-          <dt>Включается сама</dt><dd>когда на карте не хватает денег</dd>
-          <dt>Первые 7 дней</dt><dd>без комиссий</dd>
-          <dt>Дальше</dt><dd>плата по тарифу — видно заранее</dd>
-          <dt>Отключить</dt><dd style="margin-bottom:0">в любой момент на экране карты</dd></dl></div>
-        <div class="foot"><p>Заявка не нужна. Кредитная история не меняется, пока вы не воспользуетесь Кубышкой</p><button class="cta" data-go="done">Подключить Кубышку</button></div>
-      </div>
+    <div class="panel">
+      <div class="in">Отвечу на вопросы</div>
+      <div class="bot"><span class="pl"><span class="mask" style="--m:url(fig/ic-plus-small.svg)"></span></span><span class="sk"><span>Навыки</span></span></div>
     </div>
   </section>
-
-  <!-- 8 · готово -->
-  <section class="scr chat" data-s="done" hidden data-step="8 · Готово" data-note="Возврат в чат замыкает цикл: Тая напомнит заранее, если к концу месяца снова будет тесно. Повторное обращение к Тае — одна из метрик успеха.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-go="home">Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs">
-      <div class="me">Кубышка на всякий случай</div>
-      <div class="ans">
-        <h2>Готово, Кубышка подключена</h2>
-        <p>Она ничего не меняет, пока денег на карте хватает. Что будет дальше:</p>
-        <ul class="done">
-          <li>Если остаток уйдёт в ноль, Кубышка добавит до 15 000 ₽</li>
-          <li>Первые 7 дней — без комиссий. Верните до 5 декабря, и это ничего не будет стоить</li>
-          <li>За 3 дня до 25-го я напишу, если остаток будет ниже обычного</li>
-        </ul>
-        <div class="info">Отключить Кубышку можно в любой момент на экране карты</div>
-        <div class="react">👍 👎 ⧉</div>
-        <div class="disc">Ответ сгенерирован ИИ и может содержать неточности. Проверяйте важную информацию. <a>Подробнее — в правилах сервиса</a></div>
-        <div class="chips2"><button data-go="home">На главную</button><button data-go="push">Пройти заново</button></div>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <!-- «это не про меня» -->
-  <section class="scr chat" data-s="notme" hidden data-step="Это не про меня" data-note="Ветка несогласия: Тая скрывает сигнал на 3 месяца и объясняет, что изменится. Отказ — нормальный исход, а не ошибка.">
-    <div class="status"><span>9:41</span><i></i></div>
-    <div class="topnav"><button class="back" data-back>Назад</button><div class="ttl"><span class="orb sm">✦</span>Тая <em>ИИ</em></div><div class="nav-r">＋ ☰</div></div>
-    <div class="scroll"><div class="msgs">
-      <div class="me">Это не про меня</div>
-      <div class="ans">
-        <h2>Поняла, больше не напоминаю</h2>
-        <p>Скрою это наблюдение на 3 месяца. Если похожая картина повторится, спрошу снова, а не буду сразу показывать разбор.</p>
-        <div class="info">Спасибо — так я лучше понимаю, когда подсказки уместны</div>
-        <div class="chips2"><button class="main" data-go="home">На главную</button><button data-go="push">Пройти заново</button></div>
-      </div>
-    </div></div>
-    <div class="composer">Отвечу на вопросы</div>
-  </section>
-
-  <div class="toast" id="toast" role="status"></div>
-  </div></div>
-
-  <aside class="side">
-    <div class="eyebrow" id="sStep">1 · Триггер</div>
-    <h1>Тая замечает, что под конец месяца тесно</h1>
-    <p id="sNote"></p>
-    <div class="steps" id="steps"></div>
-    <div class="hint">Кликайте по экрану телефона: карточки Таи, кнопки и подсказки в чате ведут дальше. Ссылки сверху — быстрый переход к шагу.</div>
-  </aside>
 </div>
+
+<!-- общие куски ответа Таи -->
+<template id="tail">
+  <img class="hr" src="fig/hr.svg" alt="">
+  <div class="actions">
+    <div class="l">
+      <button class="act" aria-label="Скопировать"><span class="mask" style="--m:url(fig/ic-copy.svg)"></span></button>
+      <button class="act" data-toggle aria-label="Нравится"><span class="mask" style="--m:url(fig/ic-up.svg)"></span></button>
+      <button class="act" data-toggle aria-label="Не нравится"><span class="mask" style="--m:url(fig/ic-down.svg)"></span></button>
+    </div>
+    <button class="act" aria-label="Ещё"><span class="mask" style="--m:url(fig/ic-more.svg);--c:#9299a2"></span></button>
+  </div>
+  <div class="foot"><p>Ответ сгенерирован ИИ и может содержать неточности. Проверяйте важную информацию.</p><p>Подробнее — в правилах сервиса</p></div>
+</template>
+
+<!-- 4 · диагноз (15:44) -->
+<template id="a-diag">
+  <p class="h1">Под конец месяца бывает тяжело</p>
+  <p class="para">Последние 3 месяца с 25 по 30 число остаток на карте опускается ниже того, что вы обычно тратите за 3 дня. В эти же дни вам переводят деньги знакомые.</p>
+  <div class="chart">
+    <p class="big">около 300 ₽</p>
+    <p class="cap">Остаток по карте в последние дни месяца. Обычно за 3 дня в доугие дни — 4 200 ₽</p>
+    <div class="plot">
+      <div style="inset:14.23% 0 0 0"><img src="fig/ch-area.svg" alt="" style="inset:0;width:100%;height:100%"></div>
+      <div style="inset:54.41% 0 45.59% 0"><img src="fig/ch-base.svg" alt="" style="left:-.24%;right:-.24%;top:-.75px;bottom:-.75px;width:100.48%;height:1.5px"></div>
+      <div style="inset:14.23% 0 5.06% 0"><img src="fig/ch-line.svg" alt="" style="left:-.4%;top:-1.14%;width:100.8%;height:102.28%"></div>
+      <div style="inset:79.04% 69.55% 14.34% 27.56%"><img src="fig/ch-dot.svg" alt="" style="left:-13.89%;top:-13.89%;width:127.78%;height:127.78%"></div>
+      <div style="inset:79.04% 36.21% 14.34% 60.9%"><img src="fig/ch-dot.svg" alt="" style="left:-13.89%;top:-13.89%;width:127.78%;height:127.78%"></div>
+      <div style="inset:79.04% 2.89% 14.34% 94.21%"><img src="fig/ch-dot.svg" alt="" style="left:-13.89%;top:-13.89%;width:127.78%;height:127.78%"></div>
+    </div>
+    <div class="xaxis"><span>сентябрь</span><span>октябрь</span><span>ноябрь</span></div>
+    <div class="legend"><div><img src="fig/lg-line.svg" alt="">остаток на карте</div><div><img src="fig/lg-dot.svg" alt="">дни, когда занимали</div></div>
+  </div>
+  <p class="h2">На чём основан вывод</p>
+  <div class="li first"><span>1.</span><span>Остаток ниже трёхдневного расхода — 3 месяца подряд</span></div>
+  <div class="li"><span>2.</span><span>В эти дни — 7 входящих переводов от 3 человек</span></div>
+  <div class="li"><span>3.</span><span>После зарплаты вы возвращали те же суммы тем же людям — похоже на займы до зарплаты</span></div>
+  <slot data-tail></slot>
+  <div class="sugg">
+    <button class="chip" data-ask="ops"><span>Покажи эти операции</span></button>
+    <button class="chip" data-ask="options"><span>Что можно сделать?</span></button>
+    <button class="chip grey" data-ask="notme"><span>Это не про меня</span></button>
+  </div>
+</template>
+
+<!-- 5 · операции (17:73) -->
+<template id="a-ops">
+  <p class="h1">Переводы с 25 по 30 число</p>
+  <p class="para">Вот на каких операциях основан вывод. Нажмите на любую — она откроется в истории.</p>
+  <div class="grp"><div class="gh"><b>Ноябрь</b><span>остаток 27-го — 340 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(47,172,254,.16)">АК</span><span class="tx"><b>Алексей К.</b><span>СБП · 26 ноября</span></span><span class="sum">+1 500 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(249,102,153,.16)">МП</span><span class="tx"><b>Мария П.</b><span>СБП · 28 ноября</span></span><span class="sum">+2 000 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(74,201,155,.16)">АС</span><span class="tx"><b>Антон С.</b><span>СБП · 29 ноября</span></span><span class="sum">+1 000 ₽</span></div>
+  </div>
+  <div class="grp"><div class="gh"><b>Октябрь</b><span>остаток 28-го — 210 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(47,172,254,.16)">АК</span><span class="tx"><b>Алексей К.</b><span>27 октября · вернули 6 ноября</span></span><span class="sum">+2 000 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(249,102,153,.16)">МП</span><span class="tx"><b>Мария П.</b><span>29 октября · вернули 6 ноября</span></span><span class="sum">+1 500 ₽</span></div>
+  </div>
+  <div class="grp"><div class="gh"><b>Сентябрь</b><span>остаток 27-го — 480 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(47,172,254,.16)">АК</span><span class="tx"><b>Алексей К.</b><span>26 сентября · вернули 5 октября</span></span><span class="sum">+1 000 ₽</span></div>
+    <div class="op"><span class="av" style="background:rgba(74,201,155,.16)">АС</span><span class="tx"><b>Антон С.</b><span>28 сентября · вернули 5 октября</span></span><span class="sum">+3 000 ₽</span></div>
+  </div>
+  <div class="quote">Всего 12 000 ₽ за 3 месяца. Сентябрь и октябрь вы вернули сразу после зарплаты</div>
+  <slot data-tail></slot>
+  <div class="sugg">
+    <button class="chip" data-ask="options"><span>Что можно сделать?</span></button>
+    <button class="chip grey" data-ask="notme"><span>Это не про меня</span></button>
+  </div>
+</template>
+
+<!-- 6 · варианты (17:557) -->
+<template id="a-options">
+  <p class="h1">Что можно сделать</p>
+  <p class="para">Несколько вариантов — выберите, что ближе. Я предупрежу заранее, если конец месяца снова будет напряжённым</p>
+  <div class="opts">
+    <button class="opt" data-ask="save"><span class="ib"><img src="fig/ic-piggy.svg" alt=""></span><span class="tx"><b>Откладывать с зарплаты</b><span>Автоматически 2 000 ₽ в день зарплаты</span></span><img class="chev" src="fig/ic-chevron.svg" alt=""></button>
+    <button class="opt" data-ask="shift"><span class="ib"><img src="fig/ic-note-check2.svg" alt=""></span><span class="tx"><b>Перенести списания</b><span>4 подписки на 1 640 ₽ списываются 25–28 числа. Можно сдвинуть</span></span><img class="chev" src="fig/ic-chevron.svg" alt=""></button>
+    <button class="opt" data-ask="review"><span class="ib"><span class="mask" style="--c:#0064fa;--m:url(fig/ic-compare.svg);-webkit-mask-position:1.126px 3px;mask-position:1.126px 3px;--s:21.749px 18px"></span></span><span class="tx"><b>Разобрать траты месяца</b><span>Покажу, что съедает бюджет во второй половине месяца</span></span><img class="chev" src="fig/ic-chevron.svg" alt=""></button>
+    <button class="opt" data-ask="kub"><span class="ib"><img src="fig/ic-wallet-up.svg" alt=""></span><span class="tx"><i>Продукт Т-Банка</i><b>Кубышка на всякий случай</b><span>Запас денег от банка — неделя без комиссий</span></span><img class="chev" src="fig/ic-chevron.svg" alt=""></button>
+  </div>
+  <slot data-tail></slot>
+  <div class="sugg">
+    <button class="chip" data-ask="warn"><span>Предупреди заранее</span></button>
+    <button class="chip grey" data-ask="notme"><span>Это не про меня</span></button>
+  </div>
+</template>
+
+<!-- 8 · готово (17:1063) -->
+<template id="a-kub">
+  <p class="h1">Готово, Кубышка подключена</p>
+  <p class="para">Она ничего не меняет, пока денег на карте хватает. Что будет дальше:</p>
+  <div class="bli first"><img src="fig/bullet.svg" alt=""><span>Если остаток уйдёт в ноль, Кубышка добавит до 15 000 ₽</span></div>
+  <div class="bli"><img src="fig/bullet.svg" alt=""><span>Первые 7 дней — без комиссий. Верните до 5 декабря, и это ничего не будет стоить</span></div>
+  <div class="bli"><img src="fig/bullet.svg" alt=""><span>За 3 дня до 25-го я напишу, если остаток будет ниже обычного</span></div>
+  <div class="quote" style="margin-top:32px">Отключить Кубышку можно в любой момент на экране карты</div>
+  <slot data-tail></slot>
+</template>
+
+<!-- ответы, которых нет на макетах: собраны из тех же блоков -->
+<template id="a-short"><p class="para" style="padding-top:0" data-text></p><slot data-tail></slot></template>
 
 <script>
 (function(){
-  var screens = [].slice.call(document.querySelectorAll('.scr'));
-  var byId = {}; screens.forEach(function(s){ byId[s.dataset.s] = s; });
-  var stack = [], current = null, toastT;
-  var stepsEl = document.getElementById('steps');
-  var order = ['push','receipt','home','consent','diag','ops','options','kub','done','notme'];
-  order.forEach(function(id){
-    var a = document.createElement('a'); a.href = '#'+id; a.textContent = byId[id].dataset.step; a.dataset.id = id;
-    stepsEl.appendChild(a);
+  var $ = function(s){ return document.querySelector(s); };
+  var screens = ['lock','receipt','home','chat'], cameFrom = 'home', busy = false;
+  var feed = $('#feed'), wrap = $('#feedwrap'), intro = $('#intro');
+
+  var Q = {
+    diag:   { q:'Да, покажи разбор', a:'a-diag' },
+    ops:    { q:'Покажи эти операции', a:'a-ops' },
+    options:{ q:'Что можно сделать?', a:'a-options' },
+    kub:    { q:'Кубышка на всякий случай', a:'a-kub' },
+    why:    { q:'Почему ты мне пишешь?', t:'Я замечаю закономерности в ваших операциях, чтобы вовремя подсказать. Это не реклама — подсказки можно отключить в настройках.', next:['diag','later'] },
+    later:  { q:'Не сейчас', t:'Хорошо. Вернусь к этому, когда вам будет удобно.', end:true },
+    notme:  { q:'Это не про меня', t:'Поняла. Скрою это наблюдение на 3 месяца, а если картина повторится — сначала спрошу.', end:true },
+    warn:   { q:'Предупреди заранее', t:'Договорились. За 3 дня до 25-го напишу, если остаток будет ниже обычного.', end:true },
+    save:   { q:'Откладывать с зарплаты', t:'Настрою автоперевод 2 000 ₽ в копилку в день зарплаты. Сумму можно поменять в любой момент.', end:true },
+    shift:  { q:'Перенести списания', t:'Покажу 4 подписки и предложу новые даты списаний — ближе к началу месяца.', end:true },
+    review: { q:'Разобрать траты месяца', t:'Открою аналитику за вторую половину месяца и покажу, что съедает бюджет.', end:true }
+  };
+
+  function show(id){ screens.forEach(function(s){ document.getElementById(s).hidden = s !== id; }); }
+
+  function openChat(from){
+    cameFrom = from; feed.innerHTML = ''; intro.hidden = false; busy = false; show('chat'); wrap.scrollTop = 0;
+  }
+
+  function fill(tplId){
+    var frag = document.getElementById(tplId).content.cloneNode(true);
+    var slot = frag.querySelector('[data-tail]');
+    if (slot) slot.replaceWith(document.getElementById('tail').content.cloneNode(true));
+    return frag;
+  }
+
+  function scrollTo(el){ wrap.scrollTo({ top: Math.max(0, el.offsetTop - 12), behavior:'smooth' }); }
+
+  function ask(key){
+    var it = Q[key]; if (!it || busy) return;
+    busy = true; intro.hidden = true;
+    [].forEach.call(feed.querySelectorAll('.sugg'), function(s){ s.classList.add('used'); });
+    var um = document.createElement('div'); um.className = 'um'; um.innerHTML = '<div></div>';
+    um.firstChild.textContent = it.q; feed.appendChild(um);
+    var sk = document.createElement('div'); sk.className = 'skel';
+    sk.innerHTML = '<div class="row"><img src="fig/taya-avatar.png" alt="">Тая думает…</div><i class="h"></i><i style="width:100%"></i><i style="width:92%"></i><i style="width:64%"></i>';
+    feed.appendChild(sk);
+    requestAnimationFrame(function(){ scrollTo(um); });
+    setTimeout(function(){
+      sk.remove();
+      var ans = document.createElement('div'); ans.className = 'ans';
+      if (it.a) ans.appendChild(fill(it.a));
+      else {
+        ans.appendChild(fill('a-short')); ans.querySelector('[data-text]').textContent = it.t;
+        var sg = document.createElement('div'); sg.className = 'sugg';
+        (it.next || []).forEach(function(k){ var b = document.createElement('button'); b.className = 'chip' + (k==='later'?' grey':''); b.dataset.ask = k; b.innerHTML = '<span></span>'; b.firstChild.textContent = Q[k].q; sg.appendChild(b); });
+        if (it.end){ var h = document.createElement('button'); h.className='chip grey'; h.dataset.home='1'; h.innerHTML='<span>На главную</span>'; sg.appendChild(h); }
+        ans.appendChild(sg);
+      }
+      [].forEach.call(ans.children, function(c, i){ c.style.animationDelay = (i * 70) + 'ms'; });
+      feed.appendChild(ans); busy = false;
+    }, it.a ? 1300 : 900);
+  }
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.go) show(b.dataset.go);
+    else if (b.dataset.chat) openChat(b.dataset.chat);
+    else if (b.dataset.ask) ask(b.dataset.ask);
+    else if (b.dataset.dismiss) document.getElementById(b.dataset.dismiss).hidden = true;
+    else if (b.dataset.home) show('home');
+    else if (b.hasAttribute('data-toggle')) b.classList.toggle('on');
+    else if (b.id === 'chatBack') show(cameFrom);
   });
 
-  function show(id, push){
-    if(!byId[id]) id = 'push';
-    if(current === id) return;
-    if(current && push !== false) stack.push(current);
-    screens.forEach(function(s){ s.hidden = s.dataset.s !== id; });
-    var el = byId[id];
-    el.classList.add('enter'); void el.offsetWidth; el.classList.remove('enter');
-    var sc = el.querySelector('.scroll'); if(sc) sc.scrollTop = 0;
-    current = id;
-    document.getElementById('sStep').textContent = el.dataset.step;
-    document.getElementById('sNote').textContent = el.dataset.note;
-    [].forEach.call(stepsEl.children, function(a){ a.classList.toggle('on', a.dataset.id === id); });
-    if(location.hash.slice(1) !== id) window.history.replaceState(null,'','#'+id);
-  }
-  function toast(t){
-    var el = document.getElementById('toast'); el.textContent = t; el.classList.add('show');
-    clearTimeout(toastT); toastT = setTimeout(function(){ el.classList.remove('show'); }, 2600);
-  }
-  document.addEventListener('click', function(e){
-    var b = e.target.closest('[data-go],[data-back],[data-toast]'); if(!b) return;
-    if(b.dataset.toast) toast(b.dataset.toast);
-    if(b.hasAttribute('data-back')){ show(stack.pop() || 'home', false); return; }
-    if(b.dataset.go) show(b.dataset.go);
-  });
-  window.addEventListener('hashchange', function(){ show(location.hash.slice(1)); });
-  show(location.hash.slice(1) || 'push', false);
+  function fit(){ var ph=$('#phone'); if (innerWidth>500){ var k=Math.min(1,(innerHeight-40)/852); ph.style.transform='scale('+k+')'; } else ph.style.transform=''; var k2=ph.clientWidth/375; [].forEach.call(document.querySelectorAll('.fix'),function(f){f.style.transform='scale('+k2+')';}); }
+  addEventListener('resize',fit); fit();
+  var start = (location.hash || '').slice(1);
+  var chain = { diag:['diag'], ops:['diag','ops'], options:['diag','options'], kub:['diag','options','kub'] };
+  if (chain[start]) {
+    openChat('home');
+    (function run(i){ if (i >= chain[start].length) return; ask(chain[start][i]); setTimeout(function(){ run(i+1); }, 1500); })(0);
+  } else if (start === 'chat') openChat('home');
+  else show(screens.indexOf(start) > -1 ? start : 'lock');
 })();
 </script>
 </body>
