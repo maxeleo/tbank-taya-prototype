@@ -436,14 +436,12 @@ p{margin:0}
     return 'M' + top[0][0] + ' ' + top[0][1] + run(top) + run(bot) + 'Z';
   }
   function startWave(el){
-    var t0 = null;
-    (function frame(ts){
-      if (!el.isConnected) return;                      // скелетон убрали — цикл останавливается
-      if (t0 === null) t0 = ts;
-      var phase = (((ts - t0) % CYCLE) / CYCLE) * STEP;
+    var t0 = Date.now();
+    var iv = setInterval(function(){
+      if (!el.isConnected){ clearInterval(iv); return; }   // скелетон убрали — стоп
+      var phase = (((Date.now() - t0) % CYCLE) / CYCLE) * STEP;
       el.setAttribute('d', wavePath(phase));
-      requestAnimationFrame(frame);
-    })(performance.now());
+    }, 16);
   }
 
   var icn = 0;
@@ -515,7 +513,7 @@ p{margin:0}
       }
       [].forEach.call(ans.children, function(c, i){ c.style.animationDelay = (i * 70) + 'ms'; });
       feed.appendChild(ans); busy = false;
-    }, it.a ? 1300 : 900);
+    }, it.a ? 2600 : 1800);
   }
 
   document.addEventListener('click', function(e){
