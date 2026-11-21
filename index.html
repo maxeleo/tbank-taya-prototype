@@ -32,8 +32,13 @@ p{margin:0}
 .hot{position:absolute;display:block}
 .fix{position:absolute;left:0;top:0;width:375px;height:852px;transform-origin:0 0;overflow:hidden}
 
+/* иконка Таи */
+.taya-ic{display:block;flex:none;border-radius:100px;overflow:hidden}
+.taya-ic svg{display:block;width:100%;height:100%}
+
 /* экран блокировки */
-#lock{background:#0b2a4a}
+#lock{background:#0b2a4a;z-index:5;will-change:transform}
+#lock.settling{transition:transform .34s cubic-bezier(.22,.9,.28,1)}
 #lock .lk{position:absolute;top:0;left:50%;height:100%;aspect-ratio:402/874;transform:translateX(-50%)}
 #lock .bg{width:100%;height:100%}
 #lock .push{position:absolute;left:4.98%;width:90.05%;top:76.43%;height:7.32%;border-radius:24px;animation:drop .6s .4s both;touch-action:pan-y;cursor:grab}
@@ -47,7 +52,26 @@ p{margin:0}
 .w-home .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .w-home b{color:#333;font-weight:590;font-size:17px;letter-spacing:-.41px}
 .w-home span{font-size:14px;color:var(--text2)}
-.w-card{position:absolute;left:16px;top:474px;width:343px;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
+/* чек: шапка — экспорт из Figma, ниже — блоки потоком, отступ 20px */
+#receipt .fix{display:flex;flex-direction:column;background:#fff}
+.rc-head{height:454px;flex:none;overflow:hidden}
+.rc-head img{display:block;width:375px;height:852px;object-fit:cover;object-position:top}
+.rc-list{flex:1;display:flex;flex-direction:column;gap:20px;padding:20px 16px 24px;overflow-y:auto;scrollbar-width:none}
+.rc-list::-webkit-scrollbar{display:none}
+.rc-block{background:#fff;border-radius:24px;padding:16px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 12px rgba(0,16,36,.05)}
+.rc-h{display:flex;justify-content:space-between;align-items:baseline}
+.rc-h b{font-weight:700;font-size:20px}
+.rc-h span{font-size:15px;color:var(--blue)}
+.rc-row{display:flex;gap:12px;align-items:center}
+.rc-row .rub{width:40px;height:40px;border-radius:20px;background:#4a7dfc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.rc-row .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rc-row .tx b{font-weight:400;font-size:17px;letter-spacing:-.41px}
+.rc-row .tx span{font-size:13px;color:var(--text2)}
+.rc-row .chev{width:16px;height:16px;flex:none;opacity:.5}
+.rc-req{display:flex;flex-direction:column;gap:2px}
+.rc-req span{font-size:13px;color:var(--text2)}
+.rc-req b{font-weight:400;font-size:17px;letter-spacing:-.41px}
+.w-card{width:100%;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 17px rgba(0,16,36,.08)}
 .w-card .top{display:flex;gap:10px;align-items:center}
 .w-card .top img{width:32px;height:32px;border-radius:100px}
 .w-card .top b{font-weight:590;font-size:17px;letter-spacing:-.41px}
@@ -153,8 +177,7 @@ p{margin:0}
 /* скелетон генерации */
 .skel{display:flex;flex-direction:column;gap:12px}
 .skel .row{display:flex;gap:10px;align-items:center;font-size:15px;color:var(--text2)}
-.skel .row img{width:24px;height:24px;border-radius:100px;animation:spin 1.6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.skel .row .taya-ic{flex:none}
 .skel i{display:block;height:14px;border-radius:7px;background:linear-gradient(90deg,#f1f2f4 0%,#e3e5e9 40%,#f1f2f4 80%);background-size:300% 100%;animation:shim 1.2s linear infinite}
 .skel i.h{height:26px;width:78%;border-radius:10px}
 @keyframes shim{from{background-position:100% 0}to{background-position:-200% 0}}
@@ -179,7 +202,7 @@ p{margin:0}
     <div class="lk">
       <img class="bg" src="fig/bg-lock.jpg" alt="Экран блокировки: пуш Т-Банка «Алексей К. Перевод 1 500 ₽»">
       <button class="hot push" id="push" data-go="receipt" aria-label="Открыть пуш Т-Банка"></button>
-      <div class="hint">Смахните пуш, чтобы открыть</div>
+      <div class="hint">Смахните пуш вбок, экран — вверх</div>
     </div>
    </div>
   </section>
@@ -187,15 +210,24 @@ p{margin:0}
   <!-- чек перевода (Figma: 2a 20:421) -->
   <section class="scr" id="receipt" hidden style="background:#fff">
    <div class="fix">
-    <img class="bg" src="fig/bg-receipt.jpg" alt="" style="position:absolute;left:0;top:0;width:100%;height:852px;object-fit:cover;object-position:top;clip-path:inset(0 0 398px 0)">
-    <div style="position:absolute;left:0;right:0;top:454px;bottom:0;background:#fff"></div>
+    <div class="rc-head"><img src="fig/bg-receipt.jpg" alt="Чек перевода: Алексей К., +1 500 ₽"></div>
     <button class="hot" style="left:0;top:56px;width:110px;height:56px" data-go="home" aria-label="Закрыть"></button>
-    <div class="w-card" id="receiptCard">
-      <div class="top"><img src="fig/taya-avatar.png" alt="" width="32" height="32" style="border-radius:100px"><b>Тая заметила</b></div>
-      <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
-      <div class="chips">
-        <button class="tchip" data-chat="receipt"><span>Разобрать</span></button>
-        <button class="tchip" data-dismiss="receiptCard"><span>Не сейчас</span></button>
+    <div class="rc-list">
+      <div class="w-card" id="receiptCard">
+        <div class="top"><span class="taya-ic" data-icon style="width:32px;height:32px"></span><b>Тая заметила</b></div>
+        <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
+        <div class="chips">
+          <button class="tchip" data-chat="receipt"><span>Разобрать</span></button>
+          <button class="tchip" data-dismiss="receiptCard"><span>Не сейчас</span></button>
+        </div>
+      </div>
+      <div class="rc-block">
+        <div class="rc-h"><b>Пополнение</b><span>Справка</span></div>
+        <div class="rc-row"><span class="rub">₽</span><span class="tx"><b>Black</b><span>1 649,60 ₽</span></span><img class="chev" src="fig/ic-chevron.svg" alt=""></div>
+      </div>
+      <div class="rc-block">
+        <div class="rc-h"><b>Реквизиты</b></div>
+        <div class="rc-req"><span>Отправитель</span><b>Алексей К.</b></div>
       </div>
     </div>
    </div>
@@ -207,7 +239,7 @@ p{margin:0}
     <img class="bg" src="fig/bg-home.jpg" alt="">
     <button class="w-home" data-chat="home">
       <span class="t"><b>Тая заметила</b><span>Конец месяца бывает напряжённым</span></span>
-      <img class="taya-ava" src="fig/taya-avatar.png" alt="Тая">
+      <span class="taya-ic" data-icon style="width:40px;height:40px"></span>
     </button>
    </div>
   </section>
@@ -223,7 +255,7 @@ p{margin:0}
       <div class="navrow">
         <div class="lead">
           <button class="glass back" id="chatBack" aria-label="Назад"><img src="fig/ic-back.svg" width="24" height="24" alt=""></button>
-          <div class="flat"><img src="fig/taya-avatar.png" alt="" id="hdrAva"><b>Тая ИИ</b></div>
+          <div class="flat"><span class="taya-ic" data-icon style="width:36px;height:36px"></span><b>Тая ИИ</b></div>
         </div>
         <div class="glass right">
           <span class="mask" style="--m:url(fig/ic-chat-plus.svg)"></span>
@@ -355,6 +387,28 @@ p{margin:0}
   var screens = ['lock','receipt','home','chat'], cameFrom = 'home', busy = false;
   var feed = $('#feed'), wrap = $('#feedwrap'), intro = $('#intro');
 
+  // иконка Таи из Figma (43:8583). В режиме «думает» по белой фигуре
+  // слева направо бежит волна: displacement-шум едет вправо, амплитуда
+  // дышит с замедлением на краях (slow in / slow out).
+  var RING = 'M32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16Z';
+  var SPARK = 'M26.3911 15.0749L24.7763 14.3317C24.192 14.1243 23.7211 13.6286 23.5183 13.0394C23.5183 13.0394 23.04 12.1046 22.7563 11.4626C22.5897 11.0929 22.2489 10.8734 21.8471 10.8734H21.3794C20.9331 10.8734 20.5803 11.1417 20.422 11.5643C20.0323 12.6006 19.2866 14.5703 17.8137 14.5703C16.8443 14.5703 15.6769 14.0963 14.7069 11.6374L13.8671 9.382C13.6437 8.78457 13.2543 8.5 12.6174 8.5H12.3349C11.714 8.5 11.3249 8.764 11.0609 9.32914L9.97743 11.6374C9.62829 12.5723 8.85857 13.2751 8.07143 13.6286L5.80343 14.7749C5.25163 15.0551 5 15.4451 5 16.0631V16.4369C5 17.0546 5.25163 17.4449 5.80343 17.7251L8.07143 18.8714C8.85857 19.2249 9.62829 19.928 9.97743 20.8626L11.0609 23.1709C11.3246 23.7357 11.714 24 12.3349 24H12.6174C13.2543 24 13.6437 23.7157 13.8671 23.118L14.7069 20.8626C15.6769 18.4037 16.8446 17.9297 17.8137 17.9297C19.2866 17.9297 20.0329 19.8994 20.422 20.9357C20.5803 21.3583 20.9331 21.6266 21.3794 21.6266H21.8471C22.2489 21.6266 22.5897 21.4071 22.7563 21.0374C23.04 20.3954 23.5183 19.4606 23.5183 19.4606C23.7211 18.8714 24.192 18.3754 24.7763 18.1683L26.3911 17.4251C26.7729 17.2669 27 16.9214 27 16.5069V15.9937C27 15.5791 26.7729 15.2331 26.3911 15.0749Z';
+  var icn = 0;
+  function icon(thinking){
+    var n = 'ti' + (++icn), f = '';
+    if (thinking) f = '<filter id="w' + n + '" filterUnits="userSpaceOnUse" x="-60" y="-60" width="152" height="152">' +
+        '<feTurbulence type="turbulence" baseFrequency="0.02 0.05" numOctaves="2" seed="5" result="n"/>' +
+        '<feOffset in="n" result="no" dx="0"><animate attributeName="dx" values="0;50" dur="2.1s" repeatCount="indefinite"/></feOffset>' +
+        '<feDisplacementMap in="SourceGraphic" in2="no" xChannelSelector="R" yChannelSelector="G" scale="2">' +
+        '<animate attributeName="scale" values="1.1;2.9;1.1" dur="2.1s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.25 1;0.45 0 0.25 1" repeatCount="indefinite"/>' +
+        '</feDisplacementMap></filter>';
+    return '<svg viewBox="0 0 32 32" aria-hidden="true"><defs>' +
+      '<linearGradient id="g' + n + '" x1="32" y1="16" x2="0" y2="16" gradientUnits="userSpaceOnUse">' +
+      '<stop stop-color="#249AFD"/><stop offset="1" stop-color="#2FCCFE"/></linearGradient>' + f + '</defs>' +
+      '<path d="' + RING + '" fill="url(#g' + n + ')"/>' +
+      '<path d="' + SPARK + '" fill="#F5F6F7"' + (thinking ? ' filter="url(#w' + n + ')"' : '') + '/></svg>';
+  }
+  [].forEach.call(document.querySelectorAll('[data-icon]'), function(el){ el.innerHTML = icon(false); });
+
   var Q = {
     diag:   { q:'Да, покажи разбор', a:'a-diag' },
     ops:    { q:'Покажи эти операции', a:'a-ops' },
@@ -369,7 +423,12 @@ p{margin:0}
     review: { q:'Разобрать траты месяца', t:'Открою аналитику за вторую половину месяца и покажу, что съедает бюджет.', end:true }
   };
 
-  function show(id){ screens.forEach(function(s){ document.getElementById(s).hidden = s !== id; }); }
+  // на экране блокировки главная лежит под шторой, чтобы её было видно при смахивании
+  function show(id){
+    screens.forEach(function(s){ document.getElementById(s).hidden = !(s === id || (id === 'lock' && s === 'home')); });
+    var lk = $('#lock');
+    if (id === 'lock'){ lk.classList.remove('settling'); lk.style.transform = ''; }
+  }
 
   function openChat(from){
     cameFrom = from; feed.innerHTML = ''; intro.hidden = false; busy = false; show('chat'); wrap.scrollTop = 0;
@@ -391,7 +450,7 @@ p{margin:0}
     var um = document.createElement('div'); um.className = 'um'; um.innerHTML = '<div></div>';
     um.firstChild.textContent = it.q; feed.appendChild(um);
     var sk = document.createElement('div'); sk.className = 'skel';
-    sk.innerHTML = '<div class="row"><img src="fig/taya-avatar.png" alt="">Тая думает…</div><i class="h"></i><i style="width:100%"></i><i style="width:92%"></i><i style="width:64%"></i>';
+    sk.innerHTML = '<div class="row"><span class="taya-ic" style="width:24px;height:24px">' + icon(true) + '</span>Тая думает…</div><i class="h"></i><i style="width:100%"></i><i style="width:92%"></i><i style="width:64%"></i>';
     feed.appendChild(sk);
     requestAnimationFrame(function(){ scrollTo(um); });
     setTimeout(function(){
@@ -423,6 +482,32 @@ p{margin:0}
 
   function fit(){ var ph=$('#phone'); if (innerWidth>500){ var k=Math.min(1,(innerHeight-40)/852); ph.style.transform='scale('+k+')'; } else ph.style.transform=''; var k2=ph.clientWidth/375; [].forEach.call(document.querySelectorAll('.fix'),function(f){f.style.transform='scale('+k2+')';}); }
   addEventListener('resize',fit); fit();
+
+  // смахнуть штору вверх — под ней главная банка
+  (function(){
+    var lock = $('#lock'); if (!lock) return;
+    var y0=0, dy=0, drag=false, THRESH=110;
+    function k(){ var ph = $('#phone'); var r = ph.getBoundingClientRect(); return r.height ? r.height/ph.offsetHeight : 1; }
+    lock.addEventListener('pointerdown', function(e){
+      if (e.target.closest('#push')) return;            // пуш смахивается вбок сам
+      drag=true; dy=0; y0=e.clientY; lock.classList.remove('settling');
+    });
+    lock.addEventListener('pointermove', function(e){
+      if(!drag) return;
+      dy = (e.clientY - y0)/k();
+      var d = dy < 0 ? dy : dy*0.18;                     // вниз почти не тянется
+      lock.style.transform = 'translateY('+d+'px)';
+    });
+    function end(){
+      if(!drag) return; drag=false; lock.classList.add('settling');
+      if (dy < -THRESH){
+        lock.style.transform = 'translateY(-110%)';
+        setTimeout(function(){ show('home'); }, 300);
+      } else lock.style.transform = '';
+    }
+    lock.addEventListener('pointerup', end);
+    lock.addEventListener('pointercancel', end);
+  })();
 
   // жёсткий свайп пуша, как на iOS
   (function(){
