@@ -36,7 +36,9 @@ p{margin:0}
 #lock{background:#0b2a4a}
 #lock .lk{position:absolute;top:0;left:50%;height:100%;aspect-ratio:402/874;transform:translateX(-50%)}
 #lock .bg{width:100%;height:100%}
-#lock .push{position:absolute;left:4.98%;width:90.05%;top:76.43%;height:7.32%;border-radius:24px;animation:drop .6s .4s both}
+#lock .push{position:absolute;left:4.98%;width:90.05%;top:76.43%;height:7.32%;border-radius:24px;animation:drop .6s .4s both;touch-action:pan-y;cursor:grab}
+#lock .push.settling{transition:transform .28s cubic-bezier(.2,.9,.3,1)}
+#lock .hint{position:absolute;left:0;right:0;top:86%;text-align:center;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;animation:drop .6s .6s both;pointer-events:none}
 @keyframes drop{from{opacity:0;transform:translateY(-14px)}}
 
 /* виджеты Таи поверх банковских экранов */
@@ -45,18 +47,7 @@ p{margin:0}
 .w-home .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .w-home b{color:#333;font-weight:590;font-size:17px;letter-spacing:-.41px}
 .w-home span{font-size:14px;color:var(--text2)}
-.breathe{animation:breathe 3.2s ease-in-out infinite;transform-origin:center;will-change:transform,filter}
-@keyframes breathe{
-  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(47,172,254,0))}
-  50%{transform:scale(1.1);filter:drop-shadow(0 0 10px rgba(47,172,254,.55))}
-}
-.aura{position:relative;display:inline-flex;align-items:center;justify-content:center}
-.aura::before{content:"";position:absolute;inset:-6px;border-radius:100px;background:radial-gradient(circle,rgba(47,172,254,.45) 0%,rgba(47,172,254,0) 70%);animation:aura 3.2s ease-in-out infinite;pointer-events:none;z-index:-1}
-@keyframes aura{
-  0%,100%{opacity:.25;transform:scale(.9)}
-  50%{opacity:.9;transform:scale(1.35)}
-}
-.w-card{position:absolute;left:16px;top:465px;width:343px;min-height:185px;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
+.w-card{position:absolute;left:16px;top:474px;width:343px;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
 .w-card .top{display:flex;gap:10px;align-items:center}
 .w-card .top img{width:32px;height:32px;border-radius:100px}
 .w-card .top b{font-weight:590;font-size:17px;letter-spacing:-.41px}
@@ -187,7 +178,8 @@ p{margin:0}
    <div class="fix">
     <div class="lk">
       <img class="bg" src="fig/bg-lock.jpg" alt="Экран блокировки: пуш Т-Банка «Алексей К. Перевод 1 500 ₽»">
-      <button class="hot push" data-go="receipt" aria-label="Открыть пуш Т-Банка"></button>
+      <button class="hot push" id="push" data-go="receipt" aria-label="Открыть пуш Т-Банка"></button>
+      <div class="hint">Смахните пуш, чтобы открыть</div>
     </div>
    </div>
   </section>
@@ -195,11 +187,11 @@ p{margin:0}
   <!-- чек перевода (Figma: 2a 20:421) -->
   <section class="scr" id="receipt" hidden style="background:#fff">
    <div class="fix">
-    <img class="bg" src="fig/bg-receipt.jpg" alt="" style="position:absolute;left:0;top:0;width:100%;height:auto;clip-path:inset(0 0 42% 0)">
-    <div style="position:absolute;left:0;right:0;top:58%;bottom:0;background:#fff"></div>
+    <img class="bg" src="fig/bg-receipt.jpg" alt="" style="position:absolute;left:0;top:0;width:100%;height:852px;object-fit:cover;object-position:top;clip-path:inset(0 0 398px 0)">
+    <div style="position:absolute;left:0;right:0;top:454px;bottom:0;background:#fff"></div>
     <button class="hot" style="left:0;top:56px;width:110px;height:56px" data-go="home" aria-label="Закрыть"></button>
     <div class="w-card" id="receiptCard">
-      <div class="top"><span class="aura"><img src="fig/taya-avatar.png" alt="" class="breathe"></span><b>Тая заметила</b></div>
+      <div class="top"><img src="fig/taya-avatar.png" alt="" width="32" height="32" style="border-radius:100px"><b>Тая заметила</b></div>
       <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
       <div class="chips">
         <button class="tchip" data-chat="receipt"><span>Разобрать</span></button>
@@ -215,7 +207,7 @@ p{margin:0}
     <img class="bg" src="fig/bg-home.jpg" alt="">
     <button class="w-home" data-chat="home">
       <span class="t"><b>Тая заметила</b><span>Конец месяца бывает напряжённым</span></span>
-      <span class="aura"><img class="taya-ava breathe" src="fig/taya-avatar.png" alt="Тая"></span>
+      <img class="taya-ava" src="fig/taya-avatar.png" alt="Тая">
     </button>
    </div>
   </section>
@@ -431,6 +423,25 @@ p{margin:0}
 
   function fit(){ var ph=$('#phone'); if (innerWidth>500){ var k=Math.min(1,(innerHeight-40)/852); ph.style.transform='scale('+k+')'; } else ph.style.transform=''; var k2=ph.clientWidth/375; [].forEach.call(document.querySelectorAll('.fix'),function(f){f.style.transform='scale('+k2+')';}); }
   addEventListener('resize',fit); fit();
+
+  // жёсткий свайп пуша, как на iOS
+  (function(){
+    var push = $('#push'); if (!push) return;
+    var x0=0, dx=0, drag=false, moved=false, THRESH=90;
+    function scale(){ var r = push.getBoundingClientRect().width; return r && push.offsetWidth ? r/push.offsetWidth : 1; }
+    function down(e){ drag=true; moved=false; dx=0; x0=e.clientX; push.classList.remove('settling'); push.setPointerCapture&&push.setPointerCapture(e.pointerId); }
+    function move(e){ if(!drag) return; dx=(e.clientX-x0)/scale(); if(Math.abs(dx)>6) moved=true;
+      var d = dx; if (Math.abs(dx)>THRESH) d = (dx>0?1:-1)*(THRESH + (Math.abs(dx)-THRESH)*0.35); // резинка после порога
+      push.style.transform='translateX('+d+'px)'; push.style.opacity = Math.max(.35, 1-Math.abs(dx)/420); }
+    function up(){ if(!drag) return; drag=false; push.classList.add('settling');
+      if (Math.abs(dx) > THRESH){ push.style.transform='translateX('+(dx>0?460:-460)+'px)'; push.style.opacity=0; setTimeout(function(){ show('receipt'); push.style.transform=''; push.style.opacity=''; push.classList.remove('settling'); }, 240); }
+      else { push.style.transform=''; push.style.opacity=''; } }
+    push.addEventListener('pointerdown', down);
+    push.addEventListener('pointermove', move);
+    push.addEventListener('pointerup', up);
+    push.addEventListener('pointercancel', up);
+    push.addEventListener('click', function(e){ if (moved){ e.preventDefault(); e.stopPropagation(); moved=false; } });
+  })();
   var start = (location.hash || '').slice(1);
   var chain = { diag:['diag'], ops:['diag','ops'], options:['diag','options'], kub:['diag','options','kub'] };
   if (chain[start]) {
