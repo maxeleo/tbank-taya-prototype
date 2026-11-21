@@ -45,8 +45,17 @@ p{margin:0}
 .w-home .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .w-home b{color:#333;font-weight:590;font-size:17px;letter-spacing:-.41px}
 .w-home span{font-size:14px;color:var(--text2)}
-.breathe{animation:breathe 2.8s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08) rotate(-6deg)}}
+.breathe{animation:breathe 3.2s ease-in-out infinite;transform-origin:center;will-change:transform,filter}
+@keyframes breathe{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(47,172,254,0))}
+  50%{transform:scale(1.1);filter:drop-shadow(0 0 10px rgba(47,172,254,.55))}
+}
+.aura{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.aura::before{content:"";position:absolute;inset:-6px;border-radius:100px;background:radial-gradient(circle,rgba(47,172,254,.45) 0%,rgba(47,172,254,0) 70%);animation:aura 3.2s ease-in-out infinite;pointer-events:none;z-index:-1}
+@keyframes aura{
+  0%,100%{opacity:.25;transform:scale(.9)}
+  50%{opacity:.9;transform:scale(1.35)}
+}
 .w-card{position:absolute;left:16px;top:465px;width:343px;background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;filter:drop-shadow(0 6px 17px rgba(0,16,36,.08))}
 .w-card .top{display:flex;gap:10px;align-items:center}
 .w-card .top img{width:32px;height:32px;border-radius:100px}
@@ -189,7 +198,7 @@ p{margin:0}
     <img class="bg" src="fig/bg-receipt.jpg" alt="">
     <button class="hot" style="left:0;top:56px;width:110px;height:56px" data-go="home" aria-label="Закрыть"></button>
     <div class="w-card" id="receiptCard">
-      <div class="top"><img src="fig/taya-avatar.png" alt="" class="breathe"><b>Тая заметила</b></div>
+      <div class="top"><span class="aura"><img src="fig/taya-avatar.png" alt="" class="breathe"></span><b>Тая заметила</b></div>
       <p>Третий месяц подряд под конец месяца вам переводят знакомые. Разберём, в чём дело?</p>
       <div class="chips">
         <button class="tchip" data-chat="receipt"><span>Разобрать</span></button>
@@ -205,7 +214,7 @@ p{margin:0}
     <img class="bg" src="fig/bg-home.jpg" alt="">
     <button class="w-home" data-chat="home">
       <span class="t"><b>Тая заметила</b><span>Конец месяца бывает напряжённым</span></span>
-      <img class="taya-ava breathe" src="fig/taya-avatar.png" alt="Тая">
+      <span class="aura"><img class="taya-ava breathe" src="fig/taya-avatar.png" alt="Тая"></span>
     </button>
    </div>
   </section>
