@@ -392,20 +392,66 @@ p{margin:0}
   // дышит с замедлением на краях (slow in / slow out).
   var RING = 'M32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16Z';
   var SPARK = 'M26.3911 15.0749L24.7763 14.3317C24.192 14.1243 23.7211 13.6286 23.5183 13.0394C23.5183 13.0394 23.04 12.1046 22.7563 11.4626C22.5897 11.0929 22.2489 10.8734 21.8471 10.8734H21.3794C20.9331 10.8734 20.5803 11.1417 20.422 11.5643C20.0323 12.6006 19.2866 14.5703 17.8137 14.5703C16.8443 14.5703 15.6769 14.0963 14.7069 11.6374L13.8671 9.382C13.6437 8.78457 13.2543 8.5 12.6174 8.5H12.3349C11.714 8.5 11.3249 8.764 11.0609 9.32914L9.97743 11.6374C9.62829 12.5723 8.85857 13.2751 8.07143 13.6286L5.80343 14.7749C5.25163 15.0551 5 15.4451 5 16.0631V16.4369C5 17.0546 5.25163 17.4449 5.80343 17.7251L8.07143 18.8714C8.85857 19.2249 9.62829 19.928 9.97743 20.8626L11.0609 23.1709C11.3246 23.7357 11.714 24 12.3349 24H12.6174C13.2543 24 13.6437 23.7157 13.8671 23.118L14.7069 20.8626C15.6769 18.4037 16.8446 17.9297 17.8137 17.9297C19.2866 17.9297 20.0329 19.8994 20.422 20.9357C20.5803 21.3583 20.9331 21.6266 21.3794 21.6266H21.8471C22.2489 21.6266 22.5897 21.4071 22.7563 21.0374C23.04 20.3954 23.5183 19.4606 23.5183 19.4606C23.7211 18.8714 24.192 18.3754 24.7763 18.1683L26.3911 17.4251C26.7729 17.2669 27 16.9214 27 16.5069V15.9937C27 15.5791 26.7729 15.2331 26.3911 15.0749Z';
+  // Волна. Фигура Таи — это профиль высоты h(x) с двумя хребтами:
+  // большой слева (x≈12.5), малый справа (x≈21.5), острия на оси в x=5 и x=27.
+  // Хребты едут вправо с шагом 9 через неподвижную огибающую: у левого острия
+  // новый хребет нарастает из нуля, в x≈12.5 он самый крупный, к x≈21.5 мельчает
+  // и у правого острия сходит на нет. Сами хребты не меняют форму — их растит
+  // и гасит огибающая, отсюда и ощущение бегущей волны.
+  var X0 = 5, X1 = 27, STEP = 9.25, AMP = 8.8, SL = 2.4, SR = 1.9, CY = 16, CYCLE = 2000;
+  function hAt(x, phase){
+    var s = (x - X0) / (X1 - X0);
+    if (s <= 0 || s >= 1) return 0;
+    var sn = Math.sin(Math.PI * s);
+    var edge = Math.sqrt(sn);                 // острия на концах
+    var tilt = 1 - 0.62 * s;                  // чем правее, тем мельче хребет
+    var base = 1.1 * Math.pow(sn, 0.3);       // тонкая ость между остриями
+    var p = 0;
+    for (var k = -2; k <= 3; k++){
+      var d = x - (12.5 + k * STEP + phase);
+      var u = d / (d < 0 ? SL : SR);          // пологий подъём, крутой спад
+      p += Math.exp(-u * u);
+    }
+    return base + AMP * edge * tilt * p;
+  }
+  function wavePath(phase){
+    var top = [], bot = [], x;
+    for (x = X0; x <= X1 + 0.001; x += 0.5){
+      var h = hAt(Math.min(x, X1), phase);
+      top.push([x, CY - h]); bot.push([x, CY + h]);
+    }
+    // сглаживание квадратичными кривыми через середины отрезков
+    function run(pts){
+      var d = '', i;
+      for (i = 1; i < pts.length - 1; i++){
+        var mx = (pts[i][0] + pts[i+1][0]) / 2, my = (pts[i][1] + pts[i+1][1]) / 2;
+        d += 'Q' + pts[i][0].toFixed(2) + ' ' + pts[i][1].toFixed(2) + ' ' + mx.toFixed(2) + ' ' + my.toFixed(2);
+      }
+      d += 'L' + pts[pts.length-1][0].toFixed(2) + ' ' + pts[pts.length-1][1].toFixed(2);
+      return d;
+    }
+    bot.reverse();
+    return 'M' + top[0][0] + ' ' + top[0][1] + run(top) + run(bot) + 'Z';
+  }
+  function startWave(el){
+    var t0 = null;
+    (function frame(ts){
+      if (!el.isConnected) return;                      // скелетон убрали — цикл останавливается
+      if (t0 === null) t0 = ts;
+      var phase = (((ts - t0) % CYCLE) / CYCLE) * STEP;
+      el.setAttribute('d', wavePath(phase));
+      requestAnimationFrame(frame);
+    })(performance.now());
+  }
+
   var icn = 0;
   function icon(thinking){
-    var n = 'ti' + (++icn), f = '';
-    if (thinking) f = '<filter id="w' + n + '" filterUnits="userSpaceOnUse" x="-60" y="-60" width="152" height="152">' +
-        '<feTurbulence type="turbulence" baseFrequency="0.02 0.05" numOctaves="2" seed="5" result="n"/>' +
-        '<feOffset in="n" result="no" dx="0"><animate attributeName="dx" values="0;50" dur="2.1s" repeatCount="indefinite"/></feOffset>' +
-        '<feDisplacementMap in="SourceGraphic" in2="no" xChannelSelector="R" yChannelSelector="G" scale="2">' +
-        '<animate attributeName="scale" values="1.1;2.9;1.1" dur="2.1s" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.25 1;0.45 0 0.25 1" repeatCount="indefinite"/>' +
-        '</feDisplacementMap></filter>';
+    var n = 'ti' + (++icn);
     return '<svg viewBox="0 0 32 32" aria-hidden="true"><defs>' +
       '<linearGradient id="g' + n + '" x1="32" y1="16" x2="0" y2="16" gradientUnits="userSpaceOnUse">' +
-      '<stop stop-color="#249AFD"/><stop offset="1" stop-color="#2FCCFE"/></linearGradient>' + f + '</defs>' +
+      '<stop stop-color="#249AFD"/><stop offset="1" stop-color="#2FCCFE"/></linearGradient></defs>' +
       '<path d="' + RING + '" fill="url(#g' + n + ')"/>' +
-      '<path d="' + SPARK + '" fill="#F5F6F7"' + (thinking ? ' filter="url(#w' + n + ')"' : '') + '/></svg>';
+      '<path class="spark" d="' + (thinking ? wavePath(0) : SPARK) + '" fill="#F5F6F7"/></svg>';
   }
   [].forEach.call(document.querySelectorAll('[data-icon]'), function(el){ el.innerHTML = icon(false); });
 
@@ -450,8 +496,9 @@ p{margin:0}
     var um = document.createElement('div'); um.className = 'um'; um.innerHTML = '<div></div>';
     um.firstChild.textContent = it.q; feed.appendChild(um);
     var sk = document.createElement('div'); sk.className = 'skel';
-    sk.innerHTML = '<div class="row"><span class="taya-ic" style="width:24px;height:24px">' + icon(true) + '</span>Тая думает…</div><i class="h"></i><i style="width:100%"></i><i style="width:92%"></i><i style="width:64%"></i>';
+    sk.innerHTML = '<div class="row"><span class="taya-ic" style="width:28px;height:28px">' + icon(true) + '</span>Тая думает…</div><i class="h"></i><i style="width:100%"></i><i style="width:92%"></i><i style="width:64%"></i>';
     feed.appendChild(sk);
+    startWave(sk.querySelector('.spark'));
     requestAnimationFrame(function(){ scrollTo(um); });
     setTimeout(function(){
       sk.remove();
