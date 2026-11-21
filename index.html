@@ -202,7 +202,7 @@ p{margin:0}
     <div class="lk">
       <img class="bg" src="fig/bg-lock.jpg" alt="Экран блокировки: пуш Т-Банка «Алексей К. Перевод 1 500 ₽»">
       <button class="hot push" id="push" data-go="receipt" aria-label="Открыть пуш Т-Банка"></button>
-      <div class="hint">Смахните пуш вбок, экран — вверх</div>
+      <div class="hint">Нажмите на пуш или смахните экран вверх</div>
     </div>
    </div>
   </section>
@@ -398,7 +398,7 @@ p{margin:0}
   // новый хребет нарастает из нуля, в x≈12.5 он самый крупный, к x≈21.5 мельчает
   // и у правого острия сходит на нет. Сами хребты не меняют форму — их растит
   // и гасит огибающая, отсюда и ощущение бегущей волны.
-  var X0 = 5, X1 = 27, STEP = 9.25, AMP = 8.2, SL = 3.4, SR = 2.6, CY = 16, CYCLE = 1900;
+  var X0 = 5, X1 = 27, STEP = 9.25, AMP = 8.2, SL = 3.0, SR = 2.25, CY = 16, CYCLE = 1400;
   function ease(t){ t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); }
   function hAt(x, phase){
     var s = (x - X0) / (X1 - X0);
